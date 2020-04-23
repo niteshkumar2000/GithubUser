@@ -14,7 +14,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 
 logger = logging.getLogger(__name__)
 
-TOKEN = 'YPUR_TOKEN_HERE'
+TOKEN = 'YOUR_API_TOKEN'
 
 def start(update, context):
     update.message.reply_text('Hello! I\'m Github userinfo bot. Use /help')
