@@ -14,7 +14,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 
 logger = logging.getLogger(__name__)
 
-TOKEN = 'YOUR_API_TOKEN'
+TOKEN = 'YOUR_TOKEN_HERE'
 
 def start(update, context):
     update.message.reply_text('Hello! I\'m Github userinfo bot. Use /help')
@@ -31,11 +31,26 @@ def echo(update, context):
     p.wait()
 
     with open('user.json') as f:
+        data = json.load(f)[0]
+    
+    with open('user.json', 'w') as outfile:
+        json.dump(data, outfile)
+
+    with open('user.json') as f:
         data = json.load(f)
 
     subprocess.Popen('rm user.json')
 
-    update.message.reply_text(data)
+    if data['UserName'] is None:
+        update.message.reply_text('Sar please gib me a valid username :/')
+
+    text = ''
+    for key in data:
+        if data[key] is None:
+            data[key] = 'None'
+        text += key + ': ' + data[key] + '\n'
+
+    update.message.reply_text(text)
 
 
 def error(update, context):
