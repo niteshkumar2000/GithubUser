@@ -10,20 +10,19 @@ class GituserSpider(scrapy.Spider):
         self.start_urls = ['https://www.github.com/%s' % username]
 
     def parse(self, response):
-        # pinned_repo = {}
-        # for i in range(1, 6):
-        #     repo = {
-        #         'name': '',
-        #         'desc': '',
-        #         'lang': ''
-        #     }
-        #     try:
-        #         repo['name'] = (response.xpath('..//div[@class="js-pinned-items-reorder-container"]//ol//li[' +str(i)  + ']//text()').extract()[6]).strip()
-        #     except IndexError:
-        #         break
-        #     repo['desc'] = (response.xpath('..//div[@class="js-pinned-items-reorder-container"]//ol//li[' +str(i)  + ']//text()').extract()[10]).strip()
-        #     repo['lang'] = (response.xpath('..//div[@class="js-pinned-items-reorder-container"]//ol//li[' +str(i)  + ']//text()').extract()[15]).strip()
-        #     pinned_repo.update({str(i): repo})
+        pinned_repos_name = response.xpath('..//span[@class="repo"]//text()').extract()
+        pinned_repos_description = response.xpath('..//div[@class="pinned-item-list-item-content"]//p[1]//text()').extract()
+        pinned_repos_language = response.xpath('..//span[@itemprop="programmingLanguage"]//text()').extract()[:6]
+        pinned_repo = {}
+        i = 0
+        for a,b,c in zip(pinned_repos_name, pinned_repos_description, pinned_repos_language):
+            i += 1
+            repo = {
+                'name': a.strip(),
+                'desc': b.strip(),
+                'lang': c.strip()
+            }
+            pinned_repo.update({str(i): repo})
         data = {
             'UserName' : response.xpath('..//h1//span[@itemprop="additionalName"]//text()').extract_first(),
             'DisplayName' : response.xpath('..//h1//span[@itemprop="name"]//text()').extract_first(),
@@ -36,7 +35,8 @@ class GituserSpider(scrapy.Spider):
             'Stars' : (response.xpath('..//span[@class="Counter hide-lg hide-md hide-sm"]//text()').extract()[2]).strip(),
             'Followers' : (response.xpath('..//span[@class="Counter hide-lg hide-md hide-sm"]//text()').extract()[3]).strip(),
             'Following' : (response.xpath('..//span[@class="Counter hide-lg hide-md hide-sm"]//text()').extract()[4]).strip(),
-            'Bio': response.xpath('..//div[@class="js-profile-editable-area"]//div//div//text()').extract_first()
+            'Bio': response.xpath('..//div[@class="js-profile-editable-area"]//div//div//text()').extract_first(),
+            'Pinned': pinned_repo
         }
         yield data
 
